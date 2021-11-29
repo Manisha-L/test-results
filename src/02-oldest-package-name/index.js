@@ -30,6 +30,21 @@ The results should have this structure:
 
 module.exports = async function oldestPackageName() {
   // TODO
-
-  return name
+  let name = '';
+  const axios = require('axios');
+  const response = await axios.post(
+    'http://ambush-api.inyourarea.co.uk/ambush/intercept',
+    {
+      url: 'https://api.npms.io/v2/search/suggestions?q=react',
+      method: 'GET',
+      return_payload: true,
+    },
+  );
+  if (response.status === 200 && response.data && response.data.content) {
+    const sortedResponse = response.data.content.sort(
+      (a, b) => new Date(a.package.date) - new Date(b.package.date),
+    );
+    name = sortedResponse[0].package.name;
+  }
+  return name;
 };
